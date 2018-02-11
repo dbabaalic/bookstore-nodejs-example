@@ -1,12 +1,16 @@
 var Registration = require('./processes/registration');
 var RegistrationApplication = require('./models/registrationApplication');
 
-var Membership = function () {
+var Datastore = require('nedb');
 
-    function registerMember (newApplication){
-      var registration = new Registration();
+var db = {};
+db.users = new Datastore();
+
+var Membership = function () {
+    async function registerMember (newApplication){
+      var registration = new Registration(db);
       var application = new RegistrationApplication(newApplication);
-      return registration.registerMember(application);
+      return await registration.registerMember(application);
     };
 
     let membership = {

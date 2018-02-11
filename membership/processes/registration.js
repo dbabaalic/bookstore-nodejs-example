@@ -8,7 +8,7 @@ var RegistrationResult = function(args) {
     return result;
 }
 
-let Registration = function() {
+let Registration = function(db) {
 
     function registerOk(user) {
         return new RegistrationResult({
@@ -26,7 +26,25 @@ let Registration = function() {
         });
     }
 
-    function registerMember (application) {
+    function isUniqueEmail(email) {
+        return new Promise((resolve, reject) => {
+            db.users.count({ email }, function (err, numberOfUsers) {
+                if(err) reject(err);
+                resolve(numberOfUsers < 1);
+            });
+        });
+    }
+
+    function createUser(user) {
+        return new Promise((resolve, reject) => {
+            db.users.insert(user, function (err, user) {
+                if(err) reject(err);
+                resolve(user);
+            });
+        });
+    }
+
+    async function registerMember (application) {
         if(!application.isValidEmail()){
             return registerNotOk('Email is required');
         }
@@ -34,11 +52,18 @@ let Registration = function() {
             return registerNotOk('Password missmatch');
         }
 
+        let isUniqueEmailResult = await isUniqueEmail(application.email);
+        
+        if(!isUniqueEmailResult){
+            return registerNotOk('Email is already taken');
+        }
+
         let user = new User({
             email: application.email,
             status: 'approved'
         });
-        return registerOk(user);
+        let createdUser = await createUser(user);
+        return registerOk(createdUser);
     }
 
     let registration = {
