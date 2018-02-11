@@ -13,4 +13,9 @@ router.post('/register', async (req, res, next) => {
     res.json(result);
 });
 
+router.post('/authenticate', async (req, res, next) => {
+    let result = await Membership.authenticate(req.body.email);
+    res.json(result);
+});
+
 module.exports = router;

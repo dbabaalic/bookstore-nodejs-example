@@ -64,13 +64,11 @@ let Registration = function(db) {
         });
         let createdUser = await createUser(user);
         return registerOk(createdUser);
-    }
+    } 
 
-    let registration = {
+    return {
         registerMember
-    }
-
-    return registration;
+    };
     
 }
 
